@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 
     public void update(User user, Long id) {
-        User user1 = userRepository.findByUsername(user.getUsername());
+        User user1 = userRepository.findByName(user.getName());
 
         userRepository.save(user);
     }
@@ -62,12 +62,12 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
 
     public User getUserByName(String name) {
-        return userRepository.findByUsername(name);
+        return userRepository.findByName(name);
     }
 
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        return userRepository.findByUsername(name);
+        return userRepository.findByName(name);
     }
     public List<Role> getRoles() {
         return repository.findAll();

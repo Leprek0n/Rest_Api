@@ -8,7 +8,7 @@
     <title>user</title>
 </head>
 <body>
-<p th:text="${user.getUsername()}">Value</p>
+<p th:text="${user.getName()}">Value</p>
 <p th:text="${user.getEmail()}">Value</p>
 
 <a th:href="@{/admin/{id}/edit (id=${user.getId()}) }">Edit</a>

@@ -3,14 +3,14 @@ package com.example.SpringBoot.model;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.Set;
+
 @Entity
 @Table(name="roles")
 public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String role;
 
 
     public Role() {
@@ -20,9 +20,9 @@ public class Role implements GrantedAuthority {
         this.id = id;
     }
 
-    public Role(Long id, String username) {
+    public Role(Long id, String role) {
         this.id = id;
-        this.username = username;
+        this.role = role;
     }
 
     public Long getId() {
@@ -33,21 +33,21 @@ public class Role implements GrantedAuthority {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getRole() {
+        return role;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setRole(String username) {
+        this.role = username;
     }
 
     @Override
     public String getAuthority() {
-        return getUsername();
+        return getRole();
     }
 
     @Override
     public String toString() {
-        return this.username;
+        return this.role;
     }
 }

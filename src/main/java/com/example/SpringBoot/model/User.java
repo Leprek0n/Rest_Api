@@ -19,7 +19,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, length = 65)
-    private String username;
+    private String name;
     @Column(nullable = false, length = 65)
     private String password;
     @Column(nullable = false, length = 65)
@@ -45,7 +45,7 @@ public class User implements UserDetails {
     }
 
     public String getUsername() {
-        return username;
+        return name;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class User implements UserDetails {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.name = username;
     }
 
     @Override
