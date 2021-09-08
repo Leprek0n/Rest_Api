@@ -1,5 +1,8 @@
 package com.example.SpringBoot.controller;
 
+
+
+import com.example.SpringBoot.model.Role;
 import com.example.SpringBoot.model.User;
 import com.example.SpringBoot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -31,25 +35,29 @@ public class AdminController {
     @GetMapping("/{id}/edit")
     public String update(Model model, @PathVariable("id") Long id) {
         User user1 = userService.get(id);
+        List<Role> roleList = userService.getRoles();
         model.addAttribute("user", user1);
+        model.addAttribute("roles", roleList);
         return "edit";
     }
 
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable("id") Long id) {
         userService.delete(id);
-        return "redirect:/admin/users";
+        return "redirect:/hello";
     }
 
     @PostMapping("/{id}")
     public String update(@ModelAttribute("user") User user, @PathVariable("id") Long id) {
-        userService.update(user, id);
+        userService.save(user);
         return "redirect:/admin/users";
     }
 
     @GetMapping("/new")
     public String newCustomer(Model model) {
+        List<Role> roleList = userService.getRoles();
         model.addAttribute("user", new User());
+        model.addAttribute("roles", roleList);
         return "new";
     }
 
@@ -58,14 +66,14 @@ public class AdminController {
         userService.save(user);
         return "redirect:/admin/users";
     }
-//    @RequestMapping("/getOne")
-//    @ResponseBody
-//    public Optional<User> getOne(Long id) {
-//        return userService.getOne(id);
-//    }
-//    @RequestMapping(value="/update", method={RequestMethod.PUT, RequestMethod.GET})
-//    public String update(User user) {
-//        userService.update(user, user.getId());
-//        return "redirect:/hello";
-//    }
+    @RequestMapping("/getOne")
+    @ResponseBody
+    public Optional<User> getOne(Long id) {
+        return userService.getOne(id);
+    }
+    @RequestMapping(value="/update", method={RequestMethod.PUT, RequestMethod.GET})
+    public String update(User user) {
+        userService.update(user, user.getId());
+        return "redirect:/hello";
+    }
 }

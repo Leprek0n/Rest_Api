@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,35 +25,27 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Autowired
     private RoleRepository repository;
 
-
+    @Transactional
     public List<User> getCustomerList() {
-        return userRepository.findAll();
+        return userRepository.getAllUsers();
     }
 
 
     public boolean save(User user) {
-
-//            user1.setUsername(user.getUsername());
-//            user1.setEmail(user.getEmail());
-//            user1.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-//            Role roleUser = repository.findByName(user.getUsername());
-//            user1.addRole(roleUser);
         userRepository.save(user);
         return true;
-
-
     }
 
-
+    @Transactional
     public User showById(Long id) {
         return userRepository.getById(id);
     }
 
-
+    @Transactional
     public void update(User user, Long id) {
         User user1 = userRepository.findByName(user.getName());
 
-        userRepository.save(user);
+        userRepository.save(user1);
     }
 
 
@@ -60,7 +53,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         userRepository.deleteById(id);
     }
 
-
+    @Transactional
     public User getUserByName(String name) {
         return userRepository.findByName(name);
     }
@@ -69,12 +62,15 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
         return userRepository.findByName(name);
     }
+    @Transactional
     public List<Role> getRoles() {
         return repository.findAll();
     }
+    @Transactional
     public User get(Long id) {
         return userRepository.getById(id);
     }
+    @Transactional
     public Optional<User> getOne(Long id) {
         return userRepository.findById(id);
     }

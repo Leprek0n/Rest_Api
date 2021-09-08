@@ -1,5 +1,6 @@
 package com.example.SpringBoot.model;
 
+
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +26,7 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 65)
     private String email;
     //        private String roleName;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name="users_roles",
             joinColumns = @JoinColumn(name="user_id"),
