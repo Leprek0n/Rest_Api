@@ -41,16 +41,6 @@ public class AdminControllersRest {
         return "redirect:/users/admin/list";
     }
 
-//    @GetMapping("/update/{id}")
-//    public String update(@PathVariable("id") Long id, Model model) {
-//        model.addAttribute("user", userService.getUserById(id));
-//        return "edit";
-//    }
-//    @PostMapping("/{id}")
-//    public String up(@ModelAttribute("user") User user){
-//        userService.save(user);
-//        return "redirect:/users/admin/list";
-//    }
     @GetMapping("/{id}")
     public String userInfo(@PathVariable("id") Long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
