@@ -1,56 +1,31 @@
 package com.example.SpringBoot.model;
 
-
+import com.example.SpringBoot.model.ERole;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name="roles")
+@Builder
 public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String role;
-
-
-
-    public Role() {
-    }
-
-    public Role(Long id) {
-        this.id = id;
-    }
-
-    public Role(Long id, String username) {
-        this.id = id;
-        this.role = username;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return role;
-    }
-
-    public void setUsername(String username) {
-        this.role = username;
+    @Column(name="role")
+    @Enumerated(EnumType.STRING)
+    private ERole role;
+    public Role(ERole eRole) {
+        this.role = eRole;
     }
 
     @Override
     public String getAuthority() {
-        return getUsername();
-    }
-
-    @Override
-    public String toString() {
-        return this.role;
+        return role.toString();
     }
 }

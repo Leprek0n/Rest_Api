@@ -1,24 +1,21 @@
 package com.example.SpringBoot.service;
 
 
-import com.example.SpringBoot.model.Role;
+
+
 import com.example.SpringBoot.model.User;
+import com.example.SpringBoot.transferObject.NewUserRequest;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
-    public List<User> getCustomerList();
+     List<User> getAllUsers();
+     User getUserById(Long id);
+    boolean existByName(String name);
+    User getUserName(String name);
+    void save(User user);
+    void delete(Long id);
+    void update(Long id, NewUserRequest newUserRequest);
+    void save(NewUserRequest user);
 
-    public boolean save(User user);
-
-    public User showById(Long id);
-
-    public void update(User user, Long id);
-
-    public void delete(Long id);
-
-    public List<Role> getRoles();
-    public User get(Long id);
-    public Optional<User> getOne(Long id);
 }
