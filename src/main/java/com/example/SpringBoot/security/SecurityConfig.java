@@ -19,7 +19,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsServiceImpl userDetailsService;
     private SuccessHandler loginSuccessHandler;
-
     @Autowired
     public SecurityConfig(UserDetailsServiceImpl userDetailsService,
                      SuccessHandler loginSuccessHandler) {
