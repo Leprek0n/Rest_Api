@@ -2,55 +2,78 @@ package com.example.SpringBoot.controller;
 
 
 import com.example.SpringBoot.model.User;
-import com.example.SpringBoot.service.UserService;
 import com.example.SpringBoot.service.UserServiceImpl;
 import com.example.SpringBoot.transferObject.NewUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
 
-@Controller
-@RequestMapping(value = "/users/admin")
+@RestController
+@RequestMapping(value = "/users/admin", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminControllersRest {
 
+    private UserServiceImpl userService;
+
     @Autowired
-    UserService userService;
-
-    @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
-        return "list";
-    }
-    @GetMapping("/new")
-    public String newUser(Model model) {
-        String[] roles = {"ADMIN", "USER"};
-        model.addAttribute("user", new NewUserRequest());
-        model.addAttribute("roles", roles);
-        return "new";
-    }
-    @PostMapping("/create")
-    public String create(@ModelAttribute("user") NewUserRequest user) {
-        userService.save(user);
-        return "redirect:/users/admin/list";
+    public AdminControllersRest(UserServiceImpl userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/{id}")
-    public String userInfo(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.getUserById(id));
-        return "userInfo";
+    @GetMapping("/allusers")
+    public ResponseEntity<List<User>> getAllUsers() {
+        final List<User> userList = userService.getAllUsers();
+
+        return userList != null && !userList.isEmpty()
+                ? ResponseEntity.ok(userList)
+                : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/delete/{id}")
-        public String delete(@PathVariable("id") Long id) {
-        userService.delete(id);
-        return "redirect:/users/admin/list";
+    @GetMapping("{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/principal")
+    public ResponseEntity<User> principal(Principal principal) {
+
+        return ResponseEntity.ok(userService.getUserByUsername(principal.getName()));
+    }
+
+    @PostMapping(value = "/newUser", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> newUserCreate(@RequestBody NewUserRequest newUserRequest) {
+        if (userService.existsByUsername(newUserRequest.getUsername())) {
+
+            return ResponseEntity.badRequest().body("Username is exist");
+        }
+
+        userService.save(newUserRequest);
+        return ResponseEntity.ok().build();
+
+    }
+
+    @DeleteMapping(value = "/delete/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUserById(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+
+
+    @PatchMapping(value = "/{id}/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    //@ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<?> updateUserById(@PathVariable Long id, @PathVariable String username, @RequestBody NewUserRequest userRequest) {
+        if (userService.existsByUsername(userRequest.getUsername())
+                & !(userRequest.getUsername().equals(username))) {
+
+            return ResponseEntity.badRequest().body("Username is exist");
+        }
+        userService.updateUser(id, userRequest);
+        return ResponseEntity.ok().build();
     }
 
 }

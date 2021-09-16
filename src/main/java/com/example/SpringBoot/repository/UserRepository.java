@@ -11,11 +11,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    @Query("select user from User user join fetch user.roles where user.username = :username")
+    Optional<User> findByUsername(@Param("username") String username);
+
     @Query("select distinct u from User u join fetch u.roles")
     List<User> getAllUsers();
-    @Query("select user from User user join fetch user.roles where user.name=:name")
-    User getUserByName(String name);
-    Boolean existsByName(String name);
+
+    Boolean existsByUsername(String username);
 
 
 }

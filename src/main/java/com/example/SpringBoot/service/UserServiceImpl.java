@@ -10,10 +10,8 @@ import com.example.SpringBoot.transferObject.NewUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -21,38 +19,38 @@ import java.util.Set;
 
 import static com.example.SpringBoot.model.ERole.ROLE_ADMIN;
 
-
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    RoleRepository roleRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
 
-    @Override
-    @Transactional
+    @Autowired
+    public UserServiceImpl(
+            UserRepository userRepository,
+            RoleRepository repository,
+            PasswordEncoder passwordEncoder) {
+
+        this.userRepository = userRepository;
+        this.roleRepository = repository;
+        this.passwordEncoder = passwordEncoder;
+
+    }
+
     public List<User> getAllUsers() {
         return userRepository.getAllUsers();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public User getUserById(Long id) {
-      return userRepository.getById(id);
-    }
+    public User getUserById(Long id) { return userRepository.getOne(id);}
 
     @Override
-    public boolean existByName(String name) {
-        return false;
-    }
+    public User getUserByUsername(String username) {
+        Optional<User> userFromDbByUserName = userRepository.findByUsername(username);
 
-    @Override
-    public User getUserName(String name) {
-        return userRepository.getUserByName(name);
+        return userFromDbByUserName.orElse(new User());
     }
 
     @Override
@@ -64,20 +62,51 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        userRepository.deleteById(id);
+    public void save(NewUserRequest newUserRequest) {
+        newUserRequest.setPassword(passwordEncoder.encode(newUserRequest.getPassword()));
+
+        User user = new User(newUserRequest.getUsername(),
+                newUserRequest.getPassword(),
+                newUserRequest.getFirstName(),
+                newUserRequest.getLastName(),
+                newUserRequest.getAge());
+        String rolesForSave = newUserRequest.getRoles();
+        Set<Role> roles = new HashSet<>();
+
+        Role adminRole = roleRepository.findByRole(ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error, Role ADMIN is not found"));
+        Role userRole = roleRepository.findByRole(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error, Role USER is not found"));
+
+        if ("ADMIN".equals(rolesForSave)) {
+            roles.add(adminRole);
+        } else if ("USER".equals(rolesForSave)) {
+            roles.add(userRole);
+        } else {
+            roles.add(userRole);
+            roles.add(adminRole);
+        }
+        user.setRoles(roles);
+        user.setPassword(newUserRequest.getPassword());
+
+        userRepository.save(user);
     }
 
     @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+
+    @Override
     @Transactional
-    public void update( Long id, NewUserRequest newUserRequest) {
-        User userToBeUpdated = userRepository.getById(id);
+    public void updateUser(Long id, NewUserRequest updatedUser) {
+        User userToBeUpdated = userRepository.getOne(id);
 
-        userToBeUpdated.setName(newUserRequest.getName());
-        userToBeUpdated.setEmail(newUserRequest.getEmail());
+        userToBeUpdated.setFirstName(updatedUser.getFirstName());
+        userToBeUpdated.setUsername(updatedUser.getUsername());
+        userToBeUpdated.setLastName(updatedUser.getLastName());
+        userToBeUpdated.setAge(updatedUser.getAge());
 
-
-        String rolesForSave = newUserRequest.getRoles();
+        String rolesForSave = updatedUser.getRoles();
         Set<Role> roles = new HashSet<>();
 
         Role userRole = roleRepository.findByRole(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error, Role USER is not found"));
@@ -102,8 +131,8 @@ public class UserServiceImpl implements UserService {
                 userToBeUpdated.setRoles(rolesFromDb);
             }
         }
-        if ((newUserRequest.getPassword()).length() > 1) {
-            userToBeUpdated.setPassword(passwordEncoder.encode(newUserRequest.getPassword()));
+        if ((updatedUser.getPassword()).length() > 1) {
+            userToBeUpdated.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         } else {
             userRepository.save(userToBeUpdated);
         }
@@ -111,25 +140,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void save(NewUserRequest user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User user1 = new User(user.getName(), user.getEmail(), user.getPassword());
-        String rolesForSave = user.getRoles();
-        Set<Role> roles = new HashSet<>();
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
 
-        Role adminRole = roleRepository.findByRole(ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error, Role ADMIN is not found"));
-        Role userRole = roleRepository.findByRole(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error, Role USER is not found"));
-
-        if("ADMIN".equals(rolesForSave)) {
-            roles.add(adminRole);
-        } else if ("USER".equals(rolesForSave)) {
-            roles.add(userRole);
-        } else {
-            roles.add(adminRole);
-            roles.add(userRole);
-        }
-        user1.setRoles(roles);
-        user1.setPassword(user.getPassword());
-        userRepository.save(user1);
     }
 }
