@@ -1,9 +1,7 @@
 package com.example.SpringBoot.model;
 
-public enum ERole {
+public enum RoleNameEnum {
     ROLE_USER,
-    ROLE_ADMIN,
-    USER,
-    ADMIN
+    ROLE_ADMIN
 
 }

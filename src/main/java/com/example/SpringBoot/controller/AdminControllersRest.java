@@ -3,7 +3,8 @@ package com.example.SpringBoot.controller;
 
 import com.example.SpringBoot.model.User;
 import com.example.SpringBoot.service.UserServiceImpl;
-import com.example.SpringBoot.transferObject.NewUserRequest;
+import com.example.SpringBoot.transferObject.Converter;
+import com.example.SpringBoot.transferObject.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,10 +19,12 @@ import java.util.List;
 public class AdminControllersRest {
 
     private UserServiceImpl userService;
+    private Converter converter;
 
     @Autowired
-    public AdminControllersRest(UserServiceImpl userService) {
+    public AdminControllersRest(UserServiceImpl userService, Converter converter) {
         this.userService = userService;
+        this.converter = converter;
     }
 
     @GetMapping("/allusers")
@@ -46,13 +49,13 @@ public class AdminControllersRest {
     }
 
     @PostMapping(value = "/newUser", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> newUserCreate(@RequestBody NewUserRequest newUserRequest) {
-        if (userService.existsByUsername(newUserRequest.getUsername())) {
+    public ResponseEntity<?> newUserCreate(@RequestBody UserDto userDto) {
+        if (userService.existsByUsername(userDto.getUsername())) {
 
             return ResponseEntity.badRequest().body("Username is exist");
         }
 
-        userService.save(newUserRequest);
+        userService.save(converter.convert(userDto));
         return ResponseEntity.ok().build();
 
     }
@@ -65,14 +68,13 @@ public class AdminControllersRest {
 
 
     @PatchMapping(value = "/{id}/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    //@ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> updateUserById(@PathVariable Long id, @PathVariable String username, @RequestBody NewUserRequest userRequest) {
+    public ResponseEntity<?> updateUserById(@PathVariable Long id, @PathVariable String username, @RequestBody UserDto userRequest) {
         if (userService.existsByUsername(userRequest.getUsername())
                 & !(userRequest.getUsername().equals(username))) {
 
             return ResponseEntity.badRequest().body("Username is exist");
         }
-        userService.updateUser(id, userRequest);
+        userService.updateUser( converter.update(id,userRequest));
         return ResponseEntity.ok().build();
     }
 

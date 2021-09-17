@@ -1,7 +1,7 @@
 package com.example.SpringBoot.service;
 
 import com.example.SpringBoot.model.User;
-import com.example.SpringBoot.transferObject.NewUserRequest;
+import com.example.SpringBoot.transferObject.UserDto;
 
 import java.util.List;
 
@@ -14,11 +14,11 @@ public interface UserService {
 
     public void save(User user);
 
-    public void updateUser(Long id, NewUserRequest updatedUser);
+    public void updateUser( User user);
 
     public void deleteUser(Long id);
 
-    public void save(NewUserRequest newUserRequest);
+    public void save(UserDto userDto);
 
 
 

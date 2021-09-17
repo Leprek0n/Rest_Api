@@ -24,9 +24,9 @@ public class Role implements GrantedAuthority {
 
     @Column(name = "name_role")
     @Enumerated(EnumType.STRING)
-    private ERole role;
+    private RoleNameEnum role;
 
-    public Role(ERole role) {
+    public Role(RoleNameEnum role) {
         this.role = role;
     }
 

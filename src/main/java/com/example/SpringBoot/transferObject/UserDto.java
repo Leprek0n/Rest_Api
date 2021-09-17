@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class NewUserRequest {
+public class UserDto {
     @Size(min = 2, max = 30, message ="Minimum 2 and maximum 30 characters")
     private String username;
 
